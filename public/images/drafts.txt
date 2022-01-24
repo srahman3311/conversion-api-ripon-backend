@@ -1,0 +1,18 @@
+user_id INT, first_name char(50), last_name char(50), username char(50), designation char(50), password char(50), status char(50), primary_key(user_id)
+serial_no INT, date_time date, payorder_no char(50), bank_name char(50), branch_name char(50), receiver_name char(50), total_amount decimal(15,2), release_status char(50), approval_status char(50), remarks char(100), primary key(serial_no)
+serial_no INT, date_time date, job char(20), subhead char(50), material_name char(50), description char(100), qty decimal(15,2), unit char(20), unit_price decimal(15,2), discount decimal(15,2), upcharge decimal(15,2), total decimal(15,2), material_status char(20), approval_status char(20), status char(20), spent_by char(20), primary key(serial_no)
+create table jobs (serial_no INT, job_heading char(20), job_id char(20), job_name char(100), value decimal(15,2), credit decimal(15,2), debit decimal(15,2), balance decimal(15,2), status char(20), primary key(serial_no));
+create table credits (serial_no INT, date_time date, job char(50), amount decimal(15,2), remarks char(100), primary key(serial_no));
+insert into jobs values (1001, "A", "A-1", "ABC Work", 2546345.20, 25466887.20, 253654.20, 2300.00, "Active");
+insert into expenses values (1001, "2020-12-20", "A-1", "Civil Work", "Brick", "Good Brick", 2320, "PCS", 20.20, 0.00, 0.00, 2320, "pending", "pending", "pending", "Rafez");
+SELECT * FROM expenses WHERE date_time BETWEEN '2020-12-20' AND '2020-12-26' AND spent_by = "rafez123";
+insert into materials values (1002, "Kicks", "Nos");
+ALTER TABLE jobs CHANGE job_name job_description char(100); //Change column name
+ALTER TABLE payorders ADD added_by char(20); //Add New Column
+
+
+
+// gameshow_db
+create table game_events (event_id INT unsigned auto_increment Primary key, event_date date, event_time char(10), event_duration char(20), question_count INT, event_creator char(20), remarks char(100));
+create table admins (admin_id INT unsigned auto_increment primary key, first_name char(20), last_name char(20), username char(20), email char(50));
+create table events (event_id INT unsigned auto_increment Primary key, event_date date, event_name char(50), event_time char(20), allotedTimeForEachQuestion char(10), event_creator char(20), question1 char(100), q1a1 char(20), q1a2 char(20), q1a3 char(20), q1a4 char(20), q1a5 char(20), q1_correct_answer char(20), question2 char(100), q2a1 char(20), q2a2 char(20), q2a3 char(20), q2a4 char(20), q2a5 char(20), q2_correct_answer char(20), question3 char(100), q3a1 char(20), q3a2 char(20), q3a3 char(20), q3a4 char(20), q3a5 char(20), q3_correct_answer char(20), question4 char(100), q4a1 char(20), q4a2 char(20), q4a3 char(20), q4a4 char(20), q4a5 char(20), q4_correct_answer char(20), remarks char(100));
