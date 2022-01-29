@@ -7,6 +7,10 @@ const fileUpload = require("express-fileupload");
 const FormData = require("form-data");
 const axios = require("axios");
 
+// https://maximorlov.com/send-a-file-with-axios-in-nodejs/
+// https://www.codingdeft.com/posts/react-upload-file-progress-bar/
+// https://github.com/vivekb084/FileFormatConverter
+
 // Express Module
 const app = express();
 
@@ -33,6 +37,14 @@ app.post("/upload", async (request, response) => {
 
     const imageFile = request.files.file;
 
+    console.log(imageFile.name);
+
+
+    // console.log(imageFile.name);
+    // console.log(imageFile)
+
+    // return response.status(200).send("hello");
+
 
 
     // mv method is given by express-fileupload package
@@ -41,90 +53,149 @@ app.post("/upload", async (request, response) => {
 
         if(uploadError) return response.status(500).send("Something went wrong");
 
+        // fs.readFile(path.join(__dirname, "/public/images/", imageFile.name), "utf8", (error, data) => {
+
+        //     console.log(data);
+        // })
+
+        //return response.status(200).send("hello");
+
+        const newFile = fs.readFileSync("./public/images/" + imageFile.name);
+        console.log(newFile.buffer);
+        // console.log("File: " + newFile);
+
         const filePath = path.join(__dirname, "/public/images/", imageFile.name);
+
+        // const pptxFile = Buffer.from(fs.readFileSync(filePath)).buffer;
+        // console.log(pptxFile);
+
+        // fs.writeFileSync("./public/images")
+
+        // console.log(fs.createReadStream(pptxFile));
+
+        // return response.status(200).send("hello");
+
         
         const file = fs.createReadStream(filePath);
 
-        const data = new FormData();
-        data.append("file", file);
+        // file.on("end", async () => {
 
-        const endpoint = "https://api2.online-convert.com/jobs";
-        const config = {
-            headers: {
-                "x-oc-api-key": process.env.API_KEY,
-                "Content-Type": "application/json",
-                "Cache-Control": "no-cache"
-            }
-        }
+            const data = new FormData();
+            data.append("file", fs.createReadStream(path.join(__dirname, "/public/images/", imageFile.name)));
 
-        const requestBody = {
-            "conversion": [{
-                "category": "document",
-                "target": "pdf"
-            }]
-        }
+            console.log(data.getHeaders());
 
-        try {
-
-            const newResponse = await axios.post(endpoint, requestBody, config);
-    
-            const { id, server } = newResponse.data;
-            
-            const conversionEndpoint = `${server}/upload-file/${id}`;
-            const newConfig = {
+            const endpoint = "https://api2.online-convert.com/jobs";
+            const config = {
                 headers: {
                     "x-oc-api-key": process.env.API_KEY,
-                    "x-oc-upload-uuid": "random_tex",
-                    ...data.getHeaders()
-
+                    "Content-Type": "application/json",
+                    "Cache-Control": "no-cache"
                 }
             }
-    
-            try {
-    
-                const conversionResponse = await axios.post(conversionEndpoint, data, newConfig);
-                console.log(conversionResponse.data);
 
-                const jobConfig = {
+            const requestBody = {
+                "conversion": [{
+                    "category": "document",
+                    "target": "pdf"
+                }]
+            }
+
+            try {
+
+                const newResponse = await axios.post(endpoint, requestBody, config);
+
+                console.log(newResponse.data);
+                // return response.status(200).send("hello");
+
+        
+                const { id, server } = newResponse.data;
+                
+                const conversionEndpoint = `${server}/upload-file/${id}`;
+                const newConfig = {
+                    maxContentLength: Infinity,
+                    maxBodyLength: Infinity, 
                     headers: {
                         "x-oc-api-key": process.env.API_KEY,
-                        "Cache-Control": "no-cache"
+                        "x-oc-upload-uuid": "random_tex",
+                        ...data.getHeaders()
+
                     }
                 }
-
-                const jobEndpoint = "https://api2.online-convert.com/jobs/" + id
-
+        
                 try {
 
-                    getJobInfo();
+                    // const conversionResponse = await axios({
+                    //     method: "post",
+                    //     url: conversionEndpoint,
+                    //     data: data,
+                    //     maxContentLength: Infinity,
+                    //     maxBodyLength: Infinity,
+                    //     headers: newConfig.headers
+                    // })
+        
+                    const conversionResponse = await axios.post(conversionEndpoint, data, newConfig);
+                    console.log(conversionResponse.data);
 
-                    function getJobInfo() {
+                    // return response.status(200).send("hello");
 
-                        setTimeout(async () => {
-
-                            const jobResponse = await axios.get(jobEndpoint, jobConfig);
-
-                            if(jobResponse.data.status.code === "completed") {
-                                return response.status(200).send(jobResponse.data.output[0].uri)
-                            }
-
-                            getJobInfo();
-                            
-                        }, 2000);
-
+                    const jobConfig = {
+                        headers: {
+                            "x-oc-api-key": process.env.API_KEY,
+                            "Cache-Control": "no-cache"
+                        }
                     }
 
+                    // https://cdn.pixabay.com/photo/2021/08/25/20/42/field-6574455__340.jpg
+
+                    const jobEndpoint = "https://api2.online-convert.com/jobs/" + id
+
+                    try {
+
+                        getJobInfo();
+
+                        function getJobInfo() {
+
+                            setTimeout(async () => {
+
+                                const jobResponse = await axios.get(jobEndpoint, jobConfig);
+
+                                console.log(jobResponse.data);
+                                // return response.status(200).send("hello");
+
+                                // if(jobResponse.data.status.code !== "completed") {
+                                //     return getJobInfo();
+                                // }
+
+                                // return response.status(200).send(jobResponse.data.output[0].uri)
+
+                                if(jobResponse.data.status.code === "completed") {
+                                    return response.status(200).send(jobResponse.data.output[0].uri)
+                                }
+
+                                getJobInfo();
+                                
+                            }, 2000);
+
+                        }
+
+                    } catch(error) {
+                        console.log(error.response);
+                        return response.status(500).send("Something went wrong")
+                    } 
+        
                 } catch(error) {
-                    console.log(error.response.data);
-                } 
-    
+                    console.log("hello1")
+                    console.log(error);
+                    return response.status(500).send("Something went wrong")
+                }
+        
             } catch(error) {
-                console.log(error.response.data);
+                console.log("hello2")
+                console.log(error.response);
+                return response.status(500).send("Something went wrong")
             }
-    
-        } catch(error) {
-            console.log(error.response.data);
-        }
+        // })  
     
         
         /*
