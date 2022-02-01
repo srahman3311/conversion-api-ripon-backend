@@ -24,6 +24,16 @@ app.use(express.json());
 
 app.post("/convert", async (request, response) => {
 
+    // Destructuring request body to get targetFileFormat
+    const { targetFileFormat } = request.body;
+
+    // Initializing category with the value document. If target file format is not jpg or mp3 then 
+    let category = "document";
+
+    // If target file format is jpg or mp3 then update the category as image or audio
+    if(targetFileFormat === "JPG") category = "image";
+    if(targetFileFormat === "MP3") category = "audio";
+
     // File is parsed by express-fileupload middleware. File data is saved temporarily in application's memory
     const file = request.files.file;
 
@@ -53,8 +63,8 @@ app.post("/convert", async (request, response) => {
 
     const requestBody = {
         "conversion": [{
-            "category": "audio",
-            "target": "mp3"
+            "category": category,
+            "target": targetFileFormat.toLowerCase()
         }]
     }
 
@@ -88,7 +98,14 @@ app.post("/convert", async (request, response) => {
                 }
             }
 
-            const jobEndpoint = "https://api2.online-convert.com/jobs/" + id
+            const jobEndpoint = "https://api2.online-convert.com/jobs/" + id;
+
+            // Initializing interval with five seconds, but need to dynamically update if video file is being converted
+            let interval = 5000;
+
+            // If category is audio then video file is being converted. As video files are expected to be large in
+            // size so delay must be greater than initially set value
+            if(category === "audio") interval = 10000;
 
             // We need to poll the request to know when the conversion completes. Because not immediately file
             // conversion will be completed so we need to make api calls in regular intervals. Once the conversion
@@ -112,7 +129,7 @@ app.post("/convert", async (request, response) => {
                         // Conversion is still processing make another api call to know the status after 2 seconds
                         getJobInfo();
                         
-                    }, 2000);
+                    }, interval);
                 }
 
             } catch(error) {
