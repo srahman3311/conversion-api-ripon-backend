@@ -24,11 +24,16 @@ app.use(express.json());
 
 app.post("/convert", async (request, response) => {
 
+    //return response.status(200).send("Ok");
+
     // Destructuring request body to get targetFileFormat
-    const { targetFileFormat } = request.body;
+    let { targetFileFormat } = request.body;
 
     // Initializing category with the value document. If target file format is not jpg or mp3 then 
     let category = "document";
+
+    if(targetFileFormat === "WORD") targetFileFormat = "docx"
+    if(targetFileFormat === "POWERPOINT") targetFileFormat = "pptx";
 
     // If target file format is jpg or mp3 then update the category as image or audio
     if(targetFileFormat === "JPG") category = "image";
@@ -51,6 +56,7 @@ app.post("/convert", async (request, response) => {
     // const file = fs.createReadStream("./public/images/" + file.name)
     // data.append("file", file)
 
+    console.log(targetFileFormat, category)
     
     const endpoint = "https://api2.online-convert.com/jobs";
     let config = { 
@@ -133,12 +139,15 @@ app.post("/convert", async (request, response) => {
                 }
 
             } catch(error) {
+                console.log("initial error: " + error.response.data);
                 return response.status(500).send("Something went wrong")
             } 
         } catch(error) {
+            console.log(error.response.data);
             return response.status(500).send("Something went wrong")
         }
     } catch(error) {
+        console.log(error.response.data);
         return response.status(500).send("Something went wrong")
     }
 })
