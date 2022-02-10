@@ -24,8 +24,6 @@ app.use(express.json());
 
 app.post("/convert", async (request, response) => {
 
-    //return response.status(200).send("Ok");
-
     // Destructuring request body to get targetFileFormat
     let { targetFileFormat } = request.body;
 
@@ -55,8 +53,6 @@ app.post("/convert", async (request, response) => {
 
     // const file = fs.createReadStream("./public/images/" + file.name)
     // data.append("file", file)
-
-    console.log(targetFileFormat, category)
     
     const endpoint = "https://api2.online-convert.com/jobs";
     let config = { 
@@ -139,83 +135,16 @@ app.post("/convert", async (request, response) => {
                 }
 
             } catch(error) {
-                console.log("initial error: " + error.response.data);
                 return response.status(500).send("Something went wrong")
             } 
         } catch(error) {
-            console.log(error.response.data);
             return response.status(500).send("Something went wrong")
         }
     } catch(error) {
-        console.log(error.response.data);
         return response.status(500).send("Something went wrong")
     }
 })
 
-
-
-
-app.post("/remote-convert", async (request, response) => {
-
-    // https://comicsnake.com/uploads/posts/2020-03/1585224686_03.jpg
-
-    const endpoint = "https://api2.online-convert.com/jobs";
-    const config = {
-        headers: {
-            "x-oc-api-key": process.env.API_KEY,
-            "Content-Type": "application/json",
-            "Cache-Control": "no-cache"
-        }
-    }
-
-    const requestBody = {
-        "input": [{
-            "type": "remote",
-            "source": "https://comicsnake.com/uploads/posts/2020-03/1585224686_03.jpg"
-        }],
-        "conversion": [{
-            "target": "png"
-        }]
-    }
-
-    try {
-
-        const newResponse = await axios.post(endpoint, requestBody, config);
-
-        const id = newResponse.data.id;
-
-        const jobConfig = {
-            headers: {
-                "x-oc-api-key": process.env.API_KEY,
-                "Cache-Control": "no-cache"
-            }
-        }
-
-        try {
-
-            const jobEndpoint = "https://api2.online-convert.com/jobs/" + id;
-
-            const jobResponse = await axios.get(jobEndpoint, jobConfig);
-            console.log("data");
-            console.log(jobResponse.data);
-
-            return response.status(200).send("OK");
-
-        } catch(error) {
-            console.log(error.response.data);
-            return response.status(500).send("Something went wrong");
-        }
-        
-        
-
-    } catch(error) {
-        console.log(error.response.data);
-        return response.status(500).send("Something went wrong");
-    }
-
-    
-
-})
 
 
 // Port & Server
