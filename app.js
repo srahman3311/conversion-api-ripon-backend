@@ -13,7 +13,8 @@ const { v4: uuidv4 } = require("uuid");
 const app = express();
 
 // Cross Platform Resource Sharing
-app.use(cors({ origin: "https://salty-sea-42548.herokuapp.com", credentials: true }));
+// app.use(cors({ origin: "https://salty-sea-42548.herokuapp.com", credentials: true }));
+app.use(cors());
 
 // Middlewares
 app.use(fileUpload()); // File system upload middleware, not database upload
