@@ -33,7 +33,7 @@ app.use(fileUpload()); // File system upload middleware, not database upload
 app.use(express.json());
 
 
-app.post("/convert", async (request, response) => {
+app.post("/convert", cors(corsOptions), async (request, response) => {
 
     // Destructuring request body to get targetFileFormat
     let { targetFileFormat } = request.body;
