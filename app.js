@@ -17,9 +17,14 @@ const app = express();
 // Then I learned from expressjs docs that some cors requests are considered complex and hence get blocked by cors
 // Solution is really simple - just put app.options("*", cors()). * means all api endpoints  
 app.options("*", cors());
-app.use(cors({
-    origin: ["http://localhost:3000", "https://salty-sea-42548.herokuapp.com"]
-}));
+const corsOptions = {
+    "origin": "*",
+    "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+    "preflightContinue": false,
+    "optionsSuccessStatus": 204,
+    "allowedHeaders": ["Content-Type"]
+}
+app.use(cors(corsOptions));
 
 
 // Middlewares
