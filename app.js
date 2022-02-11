@@ -16,7 +16,6 @@ const app = express();
 // For excel and word files my requests were blocked by cors policy. Adding origin and credentials was not helping.
 // Then I learned from expressjs docs that some cors requests are considered complex and hence get blocked by cors
 // Solution is really simple - just put app.options("*", cors()). * means all api endpoints  
-app.options("*", cors());
 const corsOptions = {
     "origin": "*",
     "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
@@ -25,6 +24,7 @@ const corsOptions = {
     "allowedHeaders": ["Content-Type"],
     "credentials": true
 }
+app.options("*", cors(corsOptions));
 app.use(cors(corsOptions));
 
 
