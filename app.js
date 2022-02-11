@@ -14,7 +14,8 @@ const app = express();
 
 // Cross Platform Resource Sharing
 // app.use(cors({ origin: "https://salty-sea-42548.herokuapp.com", credentials: true }));
-app.use(cors());
+// app.use(cors());
+app.use(cors({ origin: "https://salty-sea-42548.herokuapp.com" }));
 
 // Middlewares
 app.use(fileUpload()); // File system upload middleware, not database upload
