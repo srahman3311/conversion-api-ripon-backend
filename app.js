@@ -16,24 +16,30 @@ const app = express();
 // For excel and word files my requests were blocked by cors policy. Adding origin and credentials was not helping.
 // Then I learned from expressjs docs that some cors requests are considered complex and hence get blocked by cors
 // Solution is really simple - just put app.options("*", cors()). * means all api endpoints  
-const corsOptions = {
-    "origin": "*",
-    "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
-    "preflightContinue": false,
-    "optionsSuccessStatus": 204,
-    "allowedHeaders": ["Content-Type"],
-    "credentials": true
-}
-app.options("*", cors(corsOptions));
-app.use(cors(corsOptions));
+// const corsOptions = {
+//     "origin": "*",
+//     "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+//     "preflightContinue": false,
+//     "optionsSuccessStatus": 204,
+//     "allowedHeaders": ["Content-Type"],
+//     "credentials": true
+// }
+// app.options("*", cors(corsOptions));
+// app.use(cors(corsOptions));
 
 
 // Middlewares
 app.use(fileUpload()); // File system upload middleware, not database upload
 app.use(express.json());
 
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 
-app.post("/convert", cors(corsOptions), async (request, response) => {
+
+app.post("/convert", async (request, response) => {
 
     // Destructuring request body to get targetFileFormat
     let { targetFileFormat } = request.body;
