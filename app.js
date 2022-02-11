@@ -12,16 +12,17 @@ const { v4: uuidv4 } = require("uuid");
 // Express Module
 const app = express();
 
-// Cross Platform Resource Sharing
-// app.use(cors({ origin: "https://salty-sea-42548.herokuapp.com", credentials: true }));
-// app.use(cors());
-app.use(cors({ origin: "https://salty-sea-42548.herokuapp.com" }));
+// I was having a strange issue when I tried to convert excel and word files. All other file conversions were okay. 
+// For excel and word files my requests were blocked by cors policy. Adding origin and credentials was not helping.
+// Then I learned from expressjs docs that some cors requests are considered complex and hence get blocked by cors
+// Solution is really simple - just put app.options("*", cors()). * means all api endpoints  
+app.options("*", cors());
+app.use(cors());
+
 
 // Middlewares
 app.use(fileUpload()); // File system upload middleware, not database upload
 app.use(express.json());
-
-
 
 
 app.post("/convert", async (request, response) => {
